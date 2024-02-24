@@ -7,6 +7,12 @@
 
     <div class="flex justify-center py-12 md:py-16">
         <form class="flex flex-col items-center" action="{{ path('client_login') }}" method="post">
+            {% if setup_finished %}
+                <p class="text-center text-green-700">
+                    Setup finished successfully! You can now log in to your admin account.
+                </p>
+            {% endif %}
+
             <div class="space-y-6">
                 <div class="input-group">
                     <label for="username">Email</label>
@@ -36,7 +42,5 @@
         </form>
     </div>
 
-    <div class="flex-grow flex justify-center items-end pb-1">
-        <p class="text-stone-400 text-sm">© {{ 'now'|date('Y') }} Maxime Thiry ― filesnap {{ project_version() }}</p>
-    </div>
+    {% include 'client/partials/footer.html.twig' %}
 {% endblock %}

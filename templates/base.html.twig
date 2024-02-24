@@ -3,6 +3,9 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        {% if disable_turbo_drive is defined and disable_turbo_drive == true %}
+            <meta name="disable-turbo-drive">
+        {% endif %}
         <title>filesnap / {% block page_title %}{% endblock %}</title>
         <link rel="icon" href="{{ asset('favicon.svg') }}">
         {% block stylesheets %}
