@@ -38,7 +38,8 @@ final class SetupController extends FilesnapAbstractController
 
     public function __construct(
         private readonly CreateUserUseCase $createUserUseCase,
-        private readonly KernelInterface $kernel
+        private readonly KernelInterface $kernel,
+        private readonly Filesystem $filesystem = new Filesystem()
     )
     {
         $this->application = new Application($this->kernel);
@@ -56,9 +57,8 @@ final class SetupController extends FilesnapAbstractController
         Request $request
     ): Response
     {
-        $filesystem = new Filesystem();
         $setupFile = "$projectDirectory/.setup";
-        $installAuthorized = $filesystem->exists($setupFile);
+        $installAuthorized = $this->filesystem->exists($setupFile);
 
         if (false === $installAuthorized) {
             return $this->redirectToRoute('client_login');
@@ -79,11 +79,7 @@ final class SetupController extends FilesnapAbstractController
             $this->createAdminUser($postedData['adminEmail'], $postedData['adminPlainPassword']);
 
             if (null === $this->error) {
-                try {
-                    $filesystem->remove($setupFile);
-                } catch (IOExceptionInterface) {
-                }
-
+                $this->filesystem->remove($setupFile);
                 return $this->redirectToRoute('client_login', ['setup_finished' => true]);
             }
         }
