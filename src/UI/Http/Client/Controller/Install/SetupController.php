@@ -67,6 +67,7 @@ final class SetupController extends FilesnapAbstractController
         $form = $this->createForm(SetupType::class);
         $form->handleRequest($request);
 
+
         if ($form->isSubmitted() && $form->isValid()) {
             if (false === defined('STDIN')) {
                 define('STDIN', fopen('php://stdin', 'rb'));
@@ -83,6 +84,8 @@ final class SetupController extends FilesnapAbstractController
                 return $this->redirectToRoute('client_login', ['setup_finished' => true]);
             }
         }
+
+        dump($form->getErrors());
 
         return $this->render(parameters: [
             'form' => $form,

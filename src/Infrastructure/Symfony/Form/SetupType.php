@@ -7,6 +7,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\PasswordStrength;
 
 final class SetupType extends AbstractType
 {
@@ -17,7 +18,13 @@ final class SetupType extends AbstractType
                 'required' => true
             ])
             ->add('adminPlainPassword', PasswordType::class, [
-                'required' => true
+                'required' => true,
+                'constraints' => [
+                    new PasswordStrength([
+                        'minScore' => PasswordStrength::STRENGTH_STRONG,
+                        'message' => 'Your password is too weak, please type a stronger password.'
+                    ])
+                ]
             ]);
     }
 }
