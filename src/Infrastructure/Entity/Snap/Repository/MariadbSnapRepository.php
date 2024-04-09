@@ -35,8 +35,8 @@ final readonly class MariadbSnapRepository implements SnapRepositoryInterface
         ';
 
         $this->connection->executeQuery($query, [
-            'id' => $snap->getId()->toBinary(),
-            'user_id' => $snap->getUserId()->toBinary(),
+            'id' => $snap->getId()->toRfc4122(),
+            'user_id' => $snap->getUserId()->toRfc4122(),
             'original_filename' => $snap->getOriginalFilename(),
             'mime_type' => $snap->getMimeType()->value,
             'creation_date' => $snap->getCreationDate()->format(MariadbTools::DATETIME_FORMAT),
@@ -52,7 +52,7 @@ final readonly class MariadbSnapRepository implements SnapRepositoryInterface
         $query = 'UPDATE snap SET last_seen_date = :last_seen_date WHERE id = :id';
 
         $this->connection->executeQuery($query, [
-            'id' => $id->toBinary(),
+            'id' => $id->toRfc4122(),
             'last_seen_date' => $lastSeenDate->format(MariadbTools::DATETIME_FORMAT)
         ]);
     }
@@ -69,7 +69,7 @@ final readonly class MariadbSnapRepository implements SnapRepositoryInterface
             WHERE id = :id
         ';
 
-        $dbResult = $this->connection->fetchAssociative($query, ['id' => $id->toBinary()]);
+        $dbResult = $this->connection->fetchAssociative($query, ['id' => $id->toRfc4122()]);
 
         if (false === $dbResult) {
             return null;
@@ -96,7 +96,7 @@ final readonly class MariadbSnapRepository implements SnapRepositoryInterface
 
         $statement = $this->connection->prepare($query);
 
-        $statement->bindValue('user_id', $userId->toBinary(), ParameterType::BINARY);
+        $statement->bindValue('user_id', $userId->toRfc4122(), ParameterType::BINARY);
         $statement->bindValue('offset', $offset, ParameterType::INTEGER);
         $statement->bindValue('limit', $limit, ParameterType::INTEGER);
 
@@ -115,7 +115,7 @@ final readonly class MariadbSnapRepository implements SnapRepositoryInterface
     {
         $query = 'SELECT COUNT(id) FROM snap WHERE user_id = :user_id';
 
-        return $this->connection->fetchOne($query, ['user_id' => $userId->toBinary()]);
+        return $this->connection->fetchOne($query, ['user_id' => $userId->toRfc4122()]);
     }
 
     /**
@@ -125,7 +125,7 @@ final readonly class MariadbSnapRepository implements SnapRepositoryInterface
     {
         $query = 'DELETE FROM snap WHERE id = :id';
 
-        $this->connection->executeQuery($query, ['id' => $id->toBinary()]);
+        $this->connection->executeQuery($query, ['id' => $id->toRfc4122()]);
     }
 
     /**
@@ -134,8 +134,8 @@ final readonly class MariadbSnapRepository implements SnapRepositoryInterface
     private function createSnapEntity(array $dbResult): Snap
     {
         return $this->snapFactory->create(
-            id: Uuid::fromBinary($dbResult['id']),
-            userId: Uuid::fromBinary($dbResult['user_id']),
+            id: Uuid::fromString($dbResult['id']),
+            userId: Uuid::fromString($dbResult['user_id']),
             originalFilename: $dbResult['original_filename'],
             mimeType: MimeType::fromString($dbResult['mime_type']),
             creationDate: new DateTime($dbResult['creation_date']),

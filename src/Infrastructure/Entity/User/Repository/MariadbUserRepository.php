@@ -25,7 +25,7 @@ final readonly class MariadbUserRepository implements UserRepositoryInterface
     public function save(User $user): void
     {
         $query = 'SELECT COUNT(id) FROM user WHERE id = :id';
-        $exists = (bool)$this->connection->fetchOne($query, ['id' => $user->getId()->toBinary()]);
+        $exists = (bool)$this->connection->fetchOne($query, ['id' => $user->getId()->toRfc4122()]);
 
         if (true === $exists) {
             $this->update($user);
@@ -41,7 +41,7 @@ final readonly class MariadbUserRepository implements UserRepositoryInterface
     public function findOneById(Uuid $id): ?User
     {
         $query = 'SELECT id, email, password, roles, authorization_key FROM user WHERE id = :id';
-        $dbResult = $this->connection->fetchAssociative($query, ['id' => $id->toBinary()]);
+        $dbResult = $this->connection->fetchAssociative($query, ['id' => $id->toRfc4122()]);
 
         if (false === $dbResult) {
             return null;
@@ -80,7 +80,7 @@ final readonly class MariadbUserRepository implements UserRepositoryInterface
 
         $dbResult = $this->connection->fetchAssociative(
             $query,
-            ['authorization_key' => $authorizationKey->toBinary()]
+            ['authorization_key' => $authorizationKey->toRfc4122()]
         );
 
         if (false === $dbResult) {
@@ -99,8 +99,10 @@ final readonly class MariadbUserRepository implements UserRepositoryInterface
 
         $this->connection->executeQuery($query, [
             'password' => $hashedPassword,
-            'id' => $id->toBinary()
+            'id' => $id->toRfc4122()
         ]);
+
+        test
     }
 
     /**
@@ -111,8 +113,8 @@ final readonly class MariadbUserRepository implements UserRepositoryInterface
         $query = 'UPDATE user SET authorization_key = :authorization_key WHERE id = :id';
 
         $this->connection->executeQuery($query, [
-            'authorization_key' => $authorizationKey->toBinary(),
-            'id' => $id->toBinary()
+            'authorization_key' => $authorizationKey->toRfc4122(),
+            'id' => $id->toRfc4122()
         ]);
     }
 
@@ -128,11 +130,11 @@ final readonly class MariadbUserRepository implements UserRepositoryInterface
         ';
 
         $this->connection->executeQuery($query, [
-            'id' => $user->getId()->toBinary(),
+            'id' => $user->getId()->toRfc4122(),
             'email' => $user->getEmail(),
             'password' => $user->getPassword(),
             'roles' => $this->jsonEncodeRolesForInsert($user->getRoles()),
-            'authorization_key' => $user->getAuthorizationKey()->toBinary()
+            'authorization_key' => $user->getAuthorizationKey()->toRfc4122()
         ]);
     }
 
@@ -152,7 +154,7 @@ final readonly class MariadbUserRepository implements UserRepositoryInterface
             'email' => $user->getEmail(),
             'password' => $user->getPassword(),
             'roles' => $this->jsonEncodeRolesForInsert($user->getRoles()),
-            'authorization_key' => $user->getAuthorizationKey()->toBinary()
+            'authorization_key' => $user->getAuthorizationKey()->toRfc4122()
         ]);
     }
 
@@ -167,11 +169,11 @@ final readonly class MariadbUserRepository implements UserRepositoryInterface
         );
 
         return new User(
-            id: Uuid::fromBinary($dbResult['id']),
+            id: Uuid::fromString($dbResult['id']),
             email: $dbResult['email'],
             password: $dbResult['password'],
             roles: $roles,
-            authorizationKey: Uuid::fromBinary($dbResult['authorization_key']),
+            authorizationKey: Uuid::fromString($dbResult['authorization_key']),
         );
     }
 

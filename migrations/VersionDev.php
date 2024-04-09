@@ -12,11 +12,11 @@ final class VersionDev extends AbstractMigration
     {
         $this->addSql('
             CREATE TABLE user (
-                id BINARY(16) NOT NULL,
+                id UUID NOT NULL,
                 email VARCHAR(255) NOT NULL,
                 password VARCHAR(255) NOT NULL,
                 roles JSON NOT NULL,
-                authorization_key BINARY(16) NOT NULL,
+                authorization_key UUID NOT NULL,
                 PRIMARY KEY (id),
                 UNIQUE INDEX unique_email (email),
                 UNIQUE INDEX unique_authorization_key (authorization_key)
@@ -25,8 +25,8 @@ final class VersionDev extends AbstractMigration
 
         $this->addSql('
             CREATE TABLE snap (
-                id BINARY(16) NOT NULL,
-                user_id BINARY(16) NOT NULL,
+                id UUID NOT NULL,
+                user_id UUID NOT NULL,
                 original_filename VARCHAR(255) NOT NULL,
                 mime_type VARCHAR(50) NOT NULL,
                 creation_date DATETIME NOT NULL,
