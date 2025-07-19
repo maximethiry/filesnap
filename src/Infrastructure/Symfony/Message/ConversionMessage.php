@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Symfony\Message;
 
-use App\Infrastructure\Symfony\Service\FormatConverter\CommonFormat;
+use App\Infrastructure\FormatConverter\CommonFormat;
 use Symfony\Component\Uid\Uuid;
 
 final readonly class ConversionMessage

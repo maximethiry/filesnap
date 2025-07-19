@@ -6,6 +6,7 @@ namespace App\Infrastructure\Symfony\Security\Entity;
 
 use App\Application\Domain\User\User;
 use App\Application\Domain\User\UserRole;
+use App\Infrastructure\UserConfiguration\UserConfiguration;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Uuid;

@@ -7,6 +7,7 @@ namespace App\UI\Console\Command;
 use App\Application\Domain\User\UserRole;
 use App\Application\UseCase\User\Create\CreateUserRequest;
 use App\Application\UseCase\User\Create\CreateUserUseCase;
+use App\Infrastructure\UseCase\User\CreateUserWithConfigurationUseCase;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -24,7 +25,7 @@ final class CreateUserCommand extends Command
         'false',
     ];
 
-    public function __construct(private readonly CreateUserUseCase $createUserUseCase)
+    public function __construct(private readonly CreateUserWithConfigurationUseCase $createUserUseCase)
     {
         parent::__construct();
     }

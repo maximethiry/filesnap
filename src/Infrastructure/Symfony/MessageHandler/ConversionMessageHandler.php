@@ -6,11 +6,11 @@ namespace App\Infrastructure\Symfony\MessageHandler;
 
 use App\Application\UseCase\Snap\FindOneById\FindOneSnapByIdRequest;
 use App\Application\UseCase\Snap\FindOneById\FindOneSnapByIdUseCase;
+use App\Infrastructure\FormatConverter\CommonFormat;
+use App\Infrastructure\FormatConverter\Format\Avif;
+use App\Infrastructure\FormatConverter\Format\Webm;
+use App\Infrastructure\FormatConverter\Format\Webp;
 use App\Infrastructure\Symfony\Message\ConversionMessage;
-use App\Infrastructure\Symfony\Service\FormatConverter\CommonFormat;
-use App\Infrastructure\Symfony\Service\FormatConverter\Format\Avif;
-use App\Infrastructure\Symfony\Service\FormatConverter\Format\Webm;
-use App\Infrastructure\Symfony\Service\FormatConverter\Format\Webp;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]

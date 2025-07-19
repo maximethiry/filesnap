@@ -6,7 +6,7 @@ namespace App\UI\Http\Client\Controller\SnapFile;
 
 use App\Application\Domain\Snap\MimeType;
 use App\Application\Domain\Snap\Snap;
-use App\Infrastructure\Symfony\Service\FormatConverter\Format\Thumbnail;
+use App\Infrastructure\FormatConverter\Format\Thumbnail;
 use App\UI\Http\Client\Controller\AbstractSnapFileController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;

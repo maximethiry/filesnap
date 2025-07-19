@@ -12,7 +12,10 @@ use App\Application\UseCase\User\UpdatePasswordById\UpdateUserPasswordByIdReques
 use App\Application\UseCase\User\UpdatePasswordById\UpdateUserPasswordByIdUseCase;
 use App\Infrastructure\Symfony\Form\UpdateEmailType;
 use App\Infrastructure\Symfony\Form\UpdatePasswordType;
+use App\Infrastructure\Symfony\Form\UserConfigurationType;
 use App\Infrastructure\Symfony\Security\AuthenticationService;
+use App\Infrastructure\UseCase\UserConfiguration\Get\GetUserConfigurationRequest;
+use App\Infrastructure\UseCase\UserConfiguration\Get\GetUserConfigurationUseCase;
 use App\UI\Http\FilesnapAbstractController;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
@@ -43,6 +46,7 @@ final class SettingsController extends FilesnapAbstractController
         private readonly UpdateUserEmailByIdUseCase $updateUserEmailByIdUseCase,
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly UpdateUserPasswordByIdUseCase $updateUserPasswordByIdUseCase,
+        private readonly GetUserConfigurationUseCase $getUserConfigurationUseCase,
     ) {
     }
 
@@ -53,11 +57,21 @@ final class SettingsController extends FilesnapAbstractController
     {
         $this->request = $request;
 
+        $useCaseResponse = ($this->getUserConfigurationUseCase)(
+            new GetUserConfigurationRequest($this->getAuthenticatedUser()->getId())
+        );
+        $userConfiguration = $useCaseResponse->userConfiguration;
+
         $updateEmailForm = $this->createForm(UpdateEmailType::class);
         $updatePasswordForm = $this->createForm(UpdatePasswordType::class);
+        $userConfigurationForm = $this->createForm(UserConfigurationType::class, [
+            'formats' => $userConfiguration->enabledConversionFormats,
+            'snapExpirationDaysInterval' => $userConfiguration->snapExpirationInterval?->d ?? 30
+        ]);
 
         $this->addForm('updateEmailForm', $updateEmailForm);
         $this->addForm('updatePasswordForm', $updatePasswordForm);
+        $this->addForm('userConfigurationForm', $userConfigurationForm);
 
         return $this->handleForms() ?? $this->view($this->forms);
     }
@@ -107,39 +121,37 @@ final class SettingsController extends FilesnapAbstractController
         }
 
         $updateEmailForm->handleRequest($this->request);
+        $formCanBeProcessed = $updateEmailForm->isSubmitted() && $updateEmailForm->isValid();
 
-        if (
-            $updateEmailForm->isSubmitted() === true
-            && $updateEmailForm->isValid() === true
-        ) {
-            $newEmail = $updateEmailForm->get('email')->getData();
-
-            if (is_string($newEmail) === false) {
-                throw new BadRequestHttpException();
-            }
-
-            $user = $this->getAuthenticatedUser();
-
-            try {
-                ($this->updateUserEmailByIdUseCase)(new UpdateUserEmailByIdRequest($user->getId(), $newEmail));
-            } catch (AlreadyExistingUserWithEmail) {
-                $message = sprintf('The email "%s" is already in use.', $newEmail);
-                $updateEmailForm->get('email')->addError(new FormError($message));
-
-                return $this->view($this->forms);
-            } catch (EmailIsUserCurrentEmail) {
-                $message = sprintf('The email "%s" is your current email.', $newEmail);
-                $updateEmailForm->get('email')->addError(new FormError($message));
-
-                return $this->view($this->forms);
-            }
-
-            $this->authenticationService->login($newEmail);
-
-            return $this->redirectToRoute('client_user_settings');
+        if ($formCanBeProcessed === false) {
+            return null;
         }
 
-        return null;
+        $newEmail = $updateEmailForm->get('email')->getData();
+
+        if (is_string($newEmail) === false) {
+            throw new BadRequestHttpException();
+        }
+
+        $user = $this->getAuthenticatedUser();
+
+        try {
+            ($this->updateUserEmailByIdUseCase)(new UpdateUserEmailByIdRequest($user->getId(), $newEmail));
+        } catch (AlreadyExistingUserWithEmail) {
+            $message = sprintf('The email "%s" is already in use.', $newEmail);
+            $updateEmailForm->get('email')->addError(new FormError($message));
+
+            return $this->view($this->forms);
+        } catch (EmailIsUserCurrentEmail) {
+            $message = sprintf('The email "%s" is your current email.', $newEmail);
+            $updateEmailForm->get('email')->addError(new FormError($message));
+
+            return $this->view($this->forms);
+        }
+
+        $this->authenticationService->login($newEmail);
+
+        return $this->redirectToRoute('client_user_settings');
     }
 
     /** @phpstan-ignore method.unused */
@@ -152,35 +164,33 @@ final class SettingsController extends FilesnapAbstractController
         }
 
         $updatePasswordForm->handleRequest($this->request);
+        $formCanBeProcessed = $updatePasswordForm->isSubmitted() && $updatePasswordForm->isValid();
 
-        if (
-            $updatePasswordForm->isSubmitted() === true
-            && $updatePasswordForm->isValid() === true
-        ) {
-            $currentPassword = $updatePasswordForm->get('currentPassword')->getData();
-            $newPassword = $updatePasswordForm->get('newPassword')->getData();
-
-            if (is_string($currentPassword) === false || is_string($newPassword) === false) {
-                throw new BadRequestHttpException();
-            }
-
-            $user = $this->getAuthenticatedUser();
-
-            if ($this->passwordHasher->isPasswordValid($user, $currentPassword) === false) {
-                throw new AccessDeniedHttpException();
-            }
-
-            ($this->updateUserPasswordByIdUseCase)(new UpdateUserPasswordByIdRequest(
-                $user->getId(),
-                $newPassword,
-                false
-            ));
-
-            $this->authenticationService->login($user->getUserIdentifier());
-
-            return $this->redirectToRoute('client_user_settings');
+        if ($formCanBeProcessed === false) {
+            return null;
         }
 
-        return null;
+        $currentPassword = $updatePasswordForm->get('currentPassword')->getData();
+        $newPassword = $updatePasswordForm->get('newPassword')->getData();
+
+        if (is_string($currentPassword) === false || is_string($newPassword) === false) {
+            throw new BadRequestHttpException();
+        }
+
+        $user = $this->getAuthenticatedUser();
+
+        if ($this->passwordHasher->isPasswordValid($user, $currentPassword) === false) {
+            throw new AccessDeniedHttpException();
+        }
+
+        ($this->updateUserPasswordByIdUseCase)(new UpdateUserPasswordByIdRequest(
+            $user->getId(),
+            $newPassword,
+            false
+        ));
+
+        $this->authenticationService->login($user->getUserIdentifier());
+
+        return $this->redirectToRoute('client_user_settings');
     }
 }

@@ -27,13 +27,13 @@ final readonly class PayloadUuidsFromBase58ValueResolver implements ValueResolve
         $uuids = array_values(array_map(
             static function (mixed $value): Uuid {
                 if (is_string($value) === false) {
-                    throw new NotFoundHttpException('Invalid argument.');
+                    throw $this->invalidArgumentHttpException();
                 }
 
                 try {
                     $uuid = Uuid::fromBase58($value);
                 } catch (\InvalidArgumentException) {
-                    throw new NotFoundHttpException('Invalid argument.');
+                    throw $this->invalidArgumentHttpException();
                 }
 
                 return $uuid;
@@ -42,5 +42,10 @@ final readonly class PayloadUuidsFromBase58ValueResolver implements ValueResolve
         ));
 
         return [$uuids];
+    }
+
+    private function invalidArgumentHttpException(): NotFoundHttpException
+    {
+        return new NotFoundHttpException('Invalid argument.');
     }
 }

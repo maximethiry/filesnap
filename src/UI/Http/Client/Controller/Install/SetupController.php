@@ -9,6 +9,7 @@ use App\Application\UseCase\User\Create\CreateUserRequest;
 use App\Application\UseCase\User\Create\CreateUserUseCase;
 use App\Infrastructure\Symfony\Form\SetupType;
 use App\Infrastructure\Symfony\Security\AuthenticationService;
+use App\Infrastructure\UseCase\User\CreateUserWithConfigurationUseCase;
 use App\UI\Http\FilesnapAbstractController;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -38,7 +39,7 @@ final class SetupController extends FilesnapAbstractController
     private ?string $error = null;
 
     public function __construct(
-        private readonly CreateUserUseCase $createUserUseCase,
+        private readonly CreateUserWithConfigurationUseCase $createUserUseCase,
         private readonly KernelInterface $kernel,
         private readonly AuthenticationService $authenticationService,
         private readonly Filesystem $filesystem = new Filesystem(),

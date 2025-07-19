@@ -10,8 +10,8 @@ use App\Application\Domain\Snap\Exception\UnsupportedFileTypeException;
 use App\Application\UseCase\Snap\Create\CreateSnapRequest;
 use App\Application\UseCase\Snap\Create\CreateSnapResponse;
 use App\Application\UseCase\Snap\Create\CreateSnapUseCase;
+use App\Infrastructure\FormatConverter\CommonFormat;
 use App\Infrastructure\Symfony\Message\ConversionMessage;
-use App\Infrastructure\Symfony\Service\FormatConverter\CommonFormat;
 use Symfony\Component\Messenger\Exception\ExceptionInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 

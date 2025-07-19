@@ -10,8 +10,8 @@ use App\Application\UseCase\Snap\FindOneById\FindOneSnapByIdRequest;
 use App\Application\UseCase\Snap\FindOneById\FindOneSnapByIdUseCase;
 use App\Application\UseCase\Snap\UpdateLastSeenDate\UpdateSnapLastSeenDateRequest;
 use App\Application\UseCase\Snap\UpdateLastSeenDate\UpdateSnapLastSeenDateUseCase;
+use App\Infrastructure\FormatConverter\CommonFormat;
 use App\Infrastructure\Symfony\Attribute\MapUuidFromBase58;
-use App\Infrastructure\Symfony\Service\FormatConverter\CommonFormat;
 use App\UI\Http\FilesnapAbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,10 +26,11 @@ abstract class AbstractSnapFileController extends FilesnapAbstractController
     ): Response {
         $useCaseResponse = $findOneSnapByIdUseCase(new FindOneSnapByIdRequest($id));
         $snap = $useCaseResponse->getSnap();
+        $currentDate = new \DateTimeImmutable();
 
         if (
             $snap === null
-            || $snap->isExpired(new \DateTimeImmutable()) === true
+            || $snap->isExpired($currentDate) === true
             || $this->supportsMimeType($snap->getMimeType()) === false
         ) {
             throw $this->createNotFoundException();
@@ -41,7 +42,7 @@ abstract class AbstractSnapFileController extends FilesnapAbstractController
         $response->headers->set('Cache-Control', 'no-store');
 
         if ($this->updateSnapLastSeenDate() === true && $response instanceof BinaryFileResponse) {
-            $updateSnapLastSeenDateUseCase(new UpdateSnapLastSeenDateRequest($snap->getId(), new \DateTimeImmutable()));
+            $updateSnapLastSeenDateUseCase(new UpdateSnapLastSeenDateRequest($snap->getId(), $currentDate));
         }
 
         return $response;

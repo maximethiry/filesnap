@@ -2,16 +2,17 @@
 
 declare(strict_types=1);
 
-use App\Infrastructure\Symfony\Service\FormatConverter\AbstractFormat;
-use App\Infrastructure\Symfony\Service\FormatConverter\Format\Avif;
-use App\Infrastructure\Symfony\Service\FormatConverter\Format\Thumbnail;
-use App\Infrastructure\Symfony\Service\FormatConverter\Format\Webm;
-use App\Infrastructure\Symfony\Service\FormatConverter\Format\Webp;
-use App\Infrastructure\Symfony\Service\FormatConverter\Storage\ConvertedLocalStorage;
-use App\Infrastructure\Symfony\Service\FormatConverter\Storage\ThumbnailLocalStorage;
-use App\Infrastructure\Symfony\Service\FormatConverter\StorageInterface;
+use App\Infrastructure\FormatConverter\AbstractFormat;
+use App\Infrastructure\FormatConverter\Format\Avif;
+use App\Infrastructure\FormatConverter\Format\Thumbnail;
+use App\Infrastructure\FormatConverter\Format\Webm;
+use App\Infrastructure\FormatConverter\Format\Webp;
+use App\Infrastructure\FormatConverter\Storage\ConvertedLocalStorage;
+use App\Infrastructure\FormatConverter\Storage\ThumbnailLocalStorage;
+use App\Infrastructure\FormatConverter\StorageInterface;
+use App\Infrastructure\UseCase\UserConfiguration\Get\GetUserConfigurationUseCase;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-
+use function Symfony\Component\DependencyInjection\Loader\Configurator\env;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 return static function (ContainerConfigurator $containerConfigurator): void {
@@ -23,7 +24,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     $parameters->set('app.upload_directory', '%kernel.project_dir%/user_uploads');
     $parameters->set('app.converted_upload_directory', '%kernel.project_dir%/user_converted_uploads');
     $parameters->set('app.thumbnail_directory', '%kernel.project_dir%/public/snap');
-    $parameters->set('app.upload.bytes_max_filesize', 50000000);
+    $parameters->set('app.upload.bytes_max_filesize', env('LOCAL_STORAGE_BYTES_MAX_FILESIZE')->int());
 
     $services = $containerConfigurator->services();
 
@@ -59,7 +60,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->arg('$extension', Webm::getExtension());
     $services
         ->set(Webm::class)
-        ->bind(StorageInterface::class, service('converted-local-storage.extension.avif'));
+        ->bind(StorageInterface::class, service('converted-local-storage.extension.webm'));
 
     // Webp format configuration
     $services

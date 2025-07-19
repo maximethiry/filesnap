@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 namespace App\UI\Http;
 
+use App\Application\Domain\User\User;
 use App\Infrastructure\Symfony\Security\Entity\SecurityUser;
+use App\Infrastructure\UseCase\UserConfiguration\Get\GetUserConfigurationUseCase;
+use App\Infrastructure\UserConfiguration\UserConfiguration;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -34,7 +39,7 @@ abstract class FilesnapAbstractController extends AbstractController
      */
     protected function view(array $parameters = [], ?Response $response = null): Response
     {
-        $routeAttributes = (new \ReflectionClass(static::class))->getAttributes(Route::class);
+        $routeAttributes = new \ReflectionClass(static::class)->getAttributes(Route::class);
 
         if ($routeAttributes === []) {
             throw new \RuntimeException(sprintf('No %s attribute for %s.', Route::class, static::class));

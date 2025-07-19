@@ -85,5 +85,12 @@
             {{ form_rest(updatePasswordForm) }}
             {{ form_end(updatePasswordForm) }}
         </div>
+        <div class="max-w-3xl mx-auto bg-stone-50 p-2 border-rounded text-stone-800">
+            <h2 class="text-2xl font-bold">Configuration</h2>
+
+            {{ form_start(userConfigurationForm, {'attr': {'class': 'flex space-x-2'}}) }}
+            {{ form_rest(userConfigurationForm) }}
+            {{ form_end(userConfigurationForm) }}
+        </div>
     </div>
 {% endblock %}

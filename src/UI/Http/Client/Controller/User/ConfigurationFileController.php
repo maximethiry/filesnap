@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\UI\Http\Client\Controller\User;
 
-use App\Infrastructure\Symfony\Service\Software\Software;
-use App\Infrastructure\Symfony\Service\Software\SoftwareConfigurationService;
+use App\Infrastructure\Software\Software;
+use App\Infrastructure\Software\SoftwareConfigurationService;
 use App\UI\Http\FilesnapAbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;

@@ -25,6 +25,16 @@ final class VersionDev extends AbstractMigration
         ');
 
         $this->addSql('
+            CREATE TABLE user_configuration (
+                user_id UUID NOT NULL,
+                enabled_conversion_formats JSON NOT NULL,
+                snap_expiration_days_interval INT UNSIGNED NULL,
+                PRIMARY KEY (user_id),
+                FOREIGN KEY (user_id) REFERENCES user (id)
+            )
+        ');
+
+        $this->addSql('
             CREATE TABLE snap (
                 id UUID NOT NULL,
                 user_id UUID NOT NULL,

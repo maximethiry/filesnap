@@ -6,13 +6,12 @@ namespace App\UI\Http\Client\Controller\SnapFile;
 
 use App\Application\Domain\Snap\MimeType;
 use App\Application\Domain\Snap\Snap;
-use App\Infrastructure\Symfony\Service\FormatConverter\CommonFormat;
-use App\Infrastructure\Symfony\Service\FormatConverter\Format\Webp;
+use App\Infrastructure\FormatConverter\CommonFormat;
+use App\Infrastructure\FormatConverter\Format\Webp;
 use App\UI\Http\Client\Controller\AbstractSnapFileController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route(
